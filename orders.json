@@ -1,0 +1,162 @@
+[
+    {
+        "company_mail": "techsolutions@gmail.com",
+        "company_name": "TechSolutions",
+        "id": 1,
+        "order_description": "Разработка мобильного приложения для доставки еды с интеграцией карт и платежных систем. Требуется бэкенд на Python и фронтенд на React Native.",
+        "order_name": "Мобильное приложение",
+        "order_price": "1500000"
+    },
+    {
+        "company_mail": "greenenergy@yandex.ru",
+        "company_name": "GreenEnergy",
+        "id": 2,
+        "order_description": "Создание веб-платформы для мониторинга солнечных панелей в реальном времени. Включает дашборды, уведомления и аналитику.",
+        "order_name": "Солнечный мониторинг",
+        "order_price": "2750000"
+    },
+    {
+        "company_mail": "logistpro@mail.ru",
+        "company_name": "ЛогистПро",
+        "id": 3,
+        "order_description": "Автоматизация складского учета с помощью телеграм-бота и админ-панели. Функции: инвентаризация, отчеты, роли сотрудников.",
+        "order_name": "Складской бот",
+        "order_price": "890000"
+    },
+    {
+        "company_mail": "medhelp@clinic.ru",
+        "company_name": "МедХелп",
+        "id": 4,
+        "order_description": "Система онлайн-записи к врачам с напоминаниями через SMS и email. Интеграция с 1С и медицинскими картами.",
+        "order_name": "Электронная регистратура",
+        "order_price": "3200000"
+    },
+    {
+        "company_mail": "eduteam@gmail.com",
+        "company_name": "EduTeam",
+        "id": 5,
+        "order_description": "Платформа для онлайн-курсов с видео-лекциями, тестами и сертификатами. Необходима система геймификации и рейтинга учеников.",
+        "order_name": "Образовательная платформа",
+        "order_price": "4100000"
+    },
+    {
+        "company_mail": "fitclub@bk.ru",
+        "company_name": "FitClub",
+        "id": 6,
+        "order_description": "Мобильное приложение для фитнес-клуба: расписание тренировок, личный кабинет, покупка абонементов, чат с тренером.",
+        "order_name": "Фитнес трекер",
+        "order_price": "1200000"
+    },
+    {
+        "company_mail": "cafe24@mail.com",
+        "company_name": "Cafe24",
+        "id": 7,
+        "order_description": "Система для кафе: столики онлайн, меню с фото, интеграция с кассой, сбор статистики по заказам и акциям.",
+        "order_name": "Кафе Онлайн",
+        "order_price": "980000"
+    },
+    {
+        "company_mail": "buildgroup@yandex.ru",
+        "company_name": "СтройГрупп",
+        "id": 8,
+        "order_description": "CRM для строительной компании: управление объектами, сметы, договоры, отчетность и контроль выполнения работ.",
+        "order_name": "Строительная CRM",
+        "order_price": "5600000"
+    },
+    {
+        "company_mail": "autoservice@bk.ru",
+        "company_name": "АвтоСервис+",
+        "id": 9,
+        "order_description": "Автоматизация автосервиса: запись клиентов, учет запчастей, чеки, напоминания о ТО, история ремонтов.",
+        "order_name": "Автосервис про",
+        "order_price": "2100000"
+    },
+    {
+        "company_mail": "travelbird@gmail.com",
+        "company_name": "TravelBird",
+        "id": 10,
+        "order_description": "Агрегатор туров с картой отелей, фильтрами и отзывами. Подбор горящих путевок, онлайн оплата и бронирование.",
+        "order_name": "Туристический агрегатор",
+        "order_price": "4700000"
+    },
+    {
+        "company_mail": "beautysalon@mail.ru",
+        "company_name": "BeautySalon",
+        "id": 11,
+        "order_description": "Приложение для салона красоты: запись к мастерам, каталог услуг, акции, отзывы, онлайн оплата.",
+        "order_name": "Салон красоты",
+        "order_price": "850000"
+    },
+    {
+        "company_mail": "legalhelp@law.ru",
+        "company_name": "Правовая защита",
+        "id": 12,
+        "order_description": "Чат-бот для юридических консультаций с шаблонами документов, поиском по законодательству и записью к юристу.",
+        "order_name": "Юридический бот",
+        "order_price": "730000"
+    },
+    {
+        "company_mail": "realtypro@yandex.ru",
+        "company_name": "RealtyPro",
+        "id": 13,
+        "order_description": "Агрегатор недвижимости: парсинг объявлений, карта, фильтры, уведомления о новых вариантах, личный кабинет риелтора.",
+        "order_name": "Поиск жилья",
+        "order_price": "3900000"
+    },
+    {
+        "company_mail": "deliveryfast@gmail.com",
+        "company_name": "DeliveryFast",
+        "id": 14,
+        "order_description": "Система управления курьерской доставкой: трекинг, оптимизация маршрутов, push-уведомления, интеграция с картами.",
+        "order_name": "Курьерская сеть",
+        "order_price": "2850000"
+    },
+    {
+        "company_mail": "eventplanner@bk.ru",
+        "company_name": "EventPlanner",
+        "id": 15,
+        "order_description": "Платформа для организации мероприятий: подбор площадок, кейтеринг, приглашения, фотоотчеты и чат с организатором.",
+        "order_name": "Event Master",
+        "order_price": "1780000"
+    },
+    {
+        "company_mail": "hrbrain@mail.ru",
+        "company_name": "HR Brain",
+        "id": 16,
+        "order_description": "HR-система: база резюме, тестирование кандидатов, онбординг, KPI, интеграция с почтой и календарями.",
+        "order_name": "HR платформа",
+        "order_price": "6250000"
+    },
+    {
+        "company_mail": "carsharing@yandex.ru",
+        "company_name": "CarShareNow",
+        "id": 17,
+        "order_description": "Приложение для каршеринга: бронирование, открытие авто через Bluetooth, тарификация, поддержка 24/7.",
+        "order_name": "Каршеринг",
+        "order_price": "9200000"
+    },
+    {
+        "company_mail": "finstart@bk.ru",
+        "company_name": "FinStart",
+        "id": 18,
+        "order_description": "Telegram-бот для учета личных финансов: категории расходов, графики, экспорт в Excel, напоминания о платежах.",
+        "order_name": "Финансовый бот",
+        "order_price": "450000"
+    },
+    {
+        "company_mail": "sportshop@gmail.com",
+        "company_name": "SportShop",
+        "id": 19,
+        "order_description": "Интернет-магазин спортивных товаров с корзиной, фильтрами по брендам, отзывами и интеграцией с логистикой.",
+        "order_name": "СпортМагазин",
+        "order_price": "1680000"
+    },
+    {
+        "company_mail": "petcare@mail.ru",
+        "company_name": "PetCare",
+        "id": 20,
+        "order_description": "Сервис для владельцев питомцев: запись к ветеринару, доставка кормов, онлайн-консультации, дневник здоровья.",
+        "order_name": "Зоопомощник",
+        "order_price": "1140000"
+    }
+]
