@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Панель администратора – заявки на разработку</title>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        .card { border: 1px solid #ccc; padding: 15px; border-radius: 10px; margin-top: 20px; }
+        .nav { margin: 20px 0; }
+        button, a { padding: 8px 12px; margin: 0 5px; text-decoration: none; background: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .delete { background: #DC3545; }
+    </style>
+</head>
+<body>
+    <h1>Заявки на разработку</h1>
+    <div class="nav">
+        {% if page > 1 %}
+            <a href="?page={{ page-1 }}">⬅️ Назад</a>
+        {% endif %}
+        <span>Страница {{ page }} из {{ ((total-1)//per_page)+1 if total>0 else 1 }}</span>
+        {% if page < ((total-1)//per_page)+1 %}
+            <a href="?page={{ page+1 }}">Далее ➡️</a>
+        {% endif %}
+    </div>
+
+    {% if order %}
+    <div class="card" id="order-card">
+        <p><strong>№{{ order.id }} / {{ total }}</strong></p>
+        <p><strong>Компания-заказчик:</strong> {{ order.company_name }}</p>
+        <p><strong>Почта компании:</strong> {{ order.company_mail }}</p>
+        <p><strong>Бюджет:</strong> {{ order.order_price }} руб.</p>
+        <p><strong>Название проекта:</strong> {{ order.order_name }}</p>
+        <p><strong>Описание:</strong> {{ order.order_description }}</p>
+        <a href="{{ url_for('delete_order', order_id=order.id) }}" class="delete" id="delete-btn">❌ Удалить заявку</a>
+    </div>
+    {% else %}
+        <p>Нет заявок.</p>
+    {% endif %}
+</body>
+</html>

@@ -53,6 +53,8 @@ async def get_inline_buttons(order_id: int, back_action: str = None, next_action
 async def _load_order(order_id: int) -> dict:
     data = await load_from_json()
     order = next((x for x in data if x['id'] == order_id), None)
+    if not order:
+        return {}
 
     order_text = f"<i>Заявка на разработку №{order['id']}/{len(data)}:</i>\n" \
            f"👜 <b>Компания-заказчик</b>:" \
@@ -78,6 +80,12 @@ async def cmd_check_end_left(callback: types.CallbackQuery, state: FSMContext, c
     callback_data.order_id -= 1
     curr_order = await _load_order(callback_data.order_id)
     action = None
+
+    if len(list(curr_order.keys())) <= 0:
+        await callback.message.edit_text(
+            text="Заказов сейчас нет"
+        )
+        return
 
     if curr_order['orders_count'] > callback_data.order_id+1:
         action = "middle"

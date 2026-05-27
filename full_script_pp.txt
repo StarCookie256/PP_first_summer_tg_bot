@@ -45,6 +45,182 @@ if __name__ == '__main__':
         logging.info("Бот выключен пользователем.")
 
  
+=== G:\Programs\PycharmProjects\PP_first_summer_tg_bot\test_ui.py === 
+import pytest
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from web_admin import app
+import threading
+import time
+import json
+import os
+
+
+# ---------- Запуск Flask-сервера в фоне для тестов ----------
+def run_flask():
+    app.run(debug=False, port=5000, use_reloader=False)
+
+
+@pytest.fixture(scope="session", autouse=True)
+def start_flask():
+    thread = threading.Thread(target=run_flask, daemon=True)
+    thread.start()
+    time.sleep(2)  # даём серверу время запуститься
+    yield
+    # очистка (необязательна, поток демонический)
+
+
+@pytest.fixture
+def driver():
+    options = webdriver.FirefoxOptions()
+    options.add_argument("--headless")  # можно убрать, если хотите видеть браузер
+    driver = webdriver.Firefox(options=options)
+    yield driver
+    driver.quit()
+
+
+@pytest.fixture
+def sample_data():
+    """Создаёт тестовые данные в orders.json перед тестами и восстанавливает после."""
+    test_orders = [
+        {"id": 1, "company_name": "ООО Ромашка", "company_mail": "romashka@mail.ru",
+         "order_price": 50000, "order_name": "CRM-система", "order_description": "Клиентская база и отчёты"},
+        {"id": 2, "company_name": "ИП Иванов", "company_mail": "ivanov@bk.ru",
+         "order_price": 30000, "order_name": "Интернет-магазин", "order_description": "Каталог товаров и корзина"}
+    ]
+    with open("orders.json", "w", encoding="utf-8") as f:
+        json.dump(test_orders, f, ensure_ascii=False, indent=4)
+    yield
+    if os.path.exists("orders.json"):
+        os.remove("orders.json")
+
+
+# ---------- 5 UI-тестов ----------
+
+
+def test_page_title(driver, sample_data):
+    """Тест 1: проверка заголовка страницы"""
+    driver.get("http://127.0.0.1:5000/")
+    assert "Панель администратора" in driver.title
+
+
+def test_order_display(driver, sample_data):
+    """Тест 2: отображаются ли данные первой заявки"""
+    driver.get("http://127.0.0.1:5000/")
+    card = WebDriverWait(driver, 5).until(
+        EC.presence_of_element_located((By.ID, "order-card"))
+    )
+    assert "ООО Ромашка" in card.text
+    assert "romashka@mail.ru" in card.text
+    assert "CRM-система" in card.text
+
+
+def test_pagination_next(driver, sample_data):
+    """Тест 3: работа кнопки 'Далее' (переход на вторую заявку)"""
+    driver.get("http://127.0.0.1:5000/")
+    next_btn = driver.find_element(By.LINK_TEXT, "Далее ➡️")
+    next_btn.click()
+    WebDriverWait(driver, 5).until(
+        EC.presence_of_element_located((By.ID, "order-card"))
+    )
+    page_text = driver.find_element(By.XPATH, "//span[contains(text(),'Страница')]").text
+    assert "Страница 2 из 2" in page_text
+    assert "ИП Иванов" in driver.page_source
+
+
+def test_delete_order(driver, sample_data):
+    """Тест 4: удаление заявки и проверка, что её больше нет"""
+    driver.get("http://127.0.0.1:5000/")
+    delete_btn = WebDriverWait(driver, 5).until(
+        EC.element_to_be_clickable((By.ID, "delete-btn"))
+    )
+    delete_btn.click()
+    # после удаления редирект на первую страницу
+    WebDriverWait(driver, 5).until(
+        EC.presence_of_element_located((By.ID, "order-card"))
+    )
+    # ожидаем, что на первой странице теперь отображается вторая заявка (бывшая id=2 стала id=1)
+    assert "ИП Иванов" in driver.page_source
+    assert "ООО Ромашка" not in driver.page_source
+
+
+def test_empty_state(driver, sample_data):
+    """Тест 5: при отсутствии заявок показывается сообщение об отсутствии"""
+    driver.get("http://127.0.0.1:5000/")
+
+    # Удаляем первую заявку
+    delete_btn = WebDriverWait(driver, 5).until(
+        EC.element_to_be_clickable((By.ID, "delete-btn"))
+    )
+    delete_btn.click()
+    # Ждём загрузки страницы с оставшейся заявкой
+    WebDriverWait(driver, 5).until(
+        EC.presence_of_element_located((By.ID, "order-card"))
+    )
+
+    # Удаляем вторую заявку
+    delete_btn = WebDriverWait(driver, 5).until(
+        EC.element_to_be_clickable((By.ID, "delete-btn"))
+    )
+    delete_btn.click()
+
+    # После удаления последней заявки появляется текст "Нет заявок"
+    WebDriverWait(driver, 5).until(
+        EC.text_to_be_present_in_element((By.TAG_NAME, "body"), "Нет заявок")
+    )
+
+    assert "Нет заявок" in driver.page_source
+ 
+=== G:\Programs\PycharmProjects\PP_first_summer_tg_bot\web_admin.py === 
+from flask import Flask, render_template, request, redirect, url_for
+import json
+import os
+
+app = Flask(__name__)
+DATA_FILE = "orders.json"
+
+
+def load_orders():
+    if not os.path.exists(DATA_FILE):
+        return []
+    with open(DATA_FILE, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def save_orders(orders):
+    with open(DATA_FILE, "w", encoding="utf-8") as f:
+        json.dump(orders, f, ensure_ascii=False, indent=4)
+
+
+@app.route('/')
+def index():
+    # Пагинация: 1 заявка на странице (для наглядности кнопок)
+    orders = load_orders()
+    page = int(request.args.get('page', 1))
+    per_page = 1
+    total = len(orders)
+    start = (page - 1) * per_page
+    end = start + per_page
+    order = orders[start] if orders and start < total else None
+    return render_template('admin.html', order=order, page=page, total=total, per_page=per_page)
+
+
+@app.route('/delete/<int:order_id>')
+def delete_order(order_id):
+    orders = load_orders()
+    orders = [o for o in orders if o.get('id') != order_id]
+    # перенумеровать id
+    for i, o in enumerate(orders, 1):
+        o['id'] = i
+    save_orders(orders)
+    return redirect(url_for('index', page=1))
+
+
+if __name__ == '__main__':
+    app.run(debug=True, port=5000)
+ 
 === G:\Programs\PycharmProjects\PP_first_summer_tg_bot\application_layer\json_saver.py === 
 import os
 import json
@@ -281,7 +457,6 @@ from aiogram import F, Router, types, filters
 from aiogram.fsm.context import FSMContext
 from bot.objects import OrderProcedure
 from application_layer.json_saver import save_to_json
-import re
 
 router = Router(name="order")
 
@@ -292,8 +467,12 @@ async def procedure_order(message: types.Message, state: FSMContext) -> None:
     await message.answer("Напишите имя компании, которая хочет подать заявку (не более 50 символов)")
 
 
-@router.message(OrderProcedure.company_name)
+@router.message(OrderProcedure.company_name, F.text)
 async def procedure_company_name(message: types.Message, state: FSMContext):
+    if message.text is None:
+        await message.answer("Пожалуйста, отправьте текстовое сообщение с названием.")
+        return
+
     company_name = message.text.strip()
     if len(company_name) > 50:
         await message.answer("❌ Название компании не может превышать 50 символов. Попробуйте ещё раз:")
@@ -303,16 +482,24 @@ async def procedure_company_name(message: types.Message, state: FSMContext):
     await message.answer("Хорошо, записал. Теперь отправьте сюда почту компании")
 
 
-@router.message(OrderProcedure.company_mail)
+@router.message(OrderProcedure.company_mail, F.text)
 async def procedure_company_mail(message: types.Message, state: FSMContext):
+    if message.text is None:
+        await message.answer("Пожалуйста, отправьте текстовое сообщение с почтой.")
+        return
+
     # Для почты валидация не требуется, но можно при желании добавить простую проверку
     await state.update_data(company_mail=message.text.strip())
     await state.set_state(OrderProcedure.order_name)
     await message.answer("Хорошо, записал. Теперь напишите краткое описание или название заявки/проекта (не более 50 символов)")
 
 
-@router.message(OrderProcedure.order_name)
+@router.message(OrderProcedure.order_name, F.text)
 async def procedure_order_name(message: types.Message, state: FSMContext):
+    if message.text is None:
+        await message.answer("Пожалуйста, отправьте текстовое сообщение с наименованием заказа.")
+        return
+
     order_name = message.text.strip()
     if len(order_name) > 50:
         await message.answer("❌ Краткое название не может превышать 50 символов. Попробуйте ещё раз:")
@@ -322,8 +509,12 @@ async def procedure_order_name(message: types.Message, state: FSMContext):
     await message.answer("Хорошо, записал. Теперь напишите сумму (только цифры), которая пойдёт на разработку продукта")
 
 
-@router.message(OrderProcedure.order_price)
+@router.message(OrderProcedure.order_price, F.text)
 async def procedure_order_price(message: types.Message, state: FSMContext):
+    if message.text is None:
+        await message.answer("Пожалуйста, отправьте текстовое сообщение с ценой заказа.")
+        return
+
     price_raw = message.text.strip()
     # Проверяем, что введены только цифры (целое положительное число)
     if not price_raw.isdigit():
@@ -335,8 +526,12 @@ async def procedure_order_price(message: types.Message, state: FSMContext):
     await message.answer("Хорошо, записал. Теперь напишите подробное описание проекта (не более 777 символов)")
 
 
-@router.message(OrderProcedure.order_description)
+@router.message(OrderProcedure.order_description, F.text)
 async def procedure_order_desc(message: types.Message, state: FSMContext):
+    if message.text is None:
+        await message.answer("Пожалуйста, отправьте текстовое сообщение с описанием заказа.")
+        return
+
     description = message.text.strip()
     if len(description) > 777:
         await message.answer("❌ Длинное описание не может превышать 777 символов. Попробуйте ещё раз:")
@@ -347,7 +542,8 @@ async def procedure_order_desc(message: types.Message, state: FSMContext):
     await save_to_json(order_data)
 
     await message.answer("Заявка успешно обработана и отправлена ✅")
-    await state.clear() 
+    await state.clear()
+ 
 === G:\Programs\PycharmProjects\PP_first_summer_tg_bot\bot\handlers\__init__.py === 
 from aiogram import Router
 from . import common, order, check_orders
